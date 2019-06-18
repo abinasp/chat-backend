@@ -99,7 +99,7 @@ export default class Users {
             const dbc = await db();
             let rooms = await dbc.collection('rooms').find().toArray();
             rooms.map(async room=>{
-                room.connections = room.connections.filter((conn)=>conn._id.toString() !== user._id.toString());
+                room.connections = room.connections.filter((conn)=>conn.username !== user.username);
                 await dbc.collection('rooms').updateOne(
                     {_id: new mongodb.ObjectID(room._id)},
                     {$set: {connections: room.connections}}

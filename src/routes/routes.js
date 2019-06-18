@@ -1,6 +1,6 @@
 import express from 'express';
 import Users from '../providers/users';
-import {isValidToken} from '../middleware/validat-token';
+import {isValidToken} from '../middleware/validate-token';
 import Rooms from '../providers/rooms';
 
 
@@ -98,26 +98,6 @@ router.get("/get-rooms",isValidToken(),async(req,res)=>{
             message: 'Error in getting all the rooms.',
             error: ex
         });
-    }
-});
-
-//access a single room
-router.get("/room/:id", isValidToken(), async(req,res)=>{
-    try{
-        let roomId = req.params.id;
-        let {user} = req.body;
-        res.status(200).json({
-            success: true,
-            message: 'Room found',
-            result: await room.OnGetSingleRoom(roomId,user)
-        })
-    }catch(ex){
-        console.error('Error in getting one room.',ex);
-        res.status(404).json({
-            success: false,
-            message: 'Error in getting one room',
-            error: ex
-        })
     }
 });
 

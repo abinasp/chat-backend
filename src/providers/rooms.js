@@ -62,7 +62,7 @@ export default class Rooms {
      * @description get a single room.
      */
 
-    OnGetSingleRoom = async(roomId,user) =>{
+    OnGetSingleRoom = async(roomId,user,socketId) =>{
         try{
             const dbc = await db();
             let room_id = new mongodb.ObjectID(roomId);
@@ -71,16 +71,15 @@ export default class Rooms {
                 throw "Room doesn't exist";
             }
             let flag = false;
-            for(let i=0;i<room.connections.length;i++){
-                if(room.connections[i]._id.toString() === user._id.toString()){
+            room.connections.map(conn=>{
+                if(conn.username === user && conn.socketId === socketId){
                     flag=true;
-                    break;
                 }
-            }
+            })
             if(!flag){
                 let connectedUser = {
-                    _id: user._id,
-                    username: user.username
+                    username: user,
+                    socketId: socketId
                 }
                 let {result} = await dbc.collection('rooms').updateOne(
                     {_id:room_id},

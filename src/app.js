@@ -3,7 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import {} from 'dotenv/config';
 import Routes from './routes/routes';
-import socket from './socket/socket';
+import {socketServer} from './socket/socket';
 
 const app = express();
 const {PORT} = process.env;
@@ -18,23 +18,4 @@ app.use(bodyParser({limit: '50mb'}));
 //Define Routes.
 app.use("/chat",Routes);
 
-//create server
-socket(app).listen(PORT,err=>{
-    	err
-		? console.log(`Unable to run the server in ${PORT} port.`)
-		: console.log(`App is running in ${PORT} port`);
-});
-// const server = app.listen(PORT, err => {
-// 	err
-// 		? console.log(`Unable to run the server in ${PORT} port.`)
-// 		: console.log(`App is running in ${PORT} port`);
-// });
-
-// const io = socket(server);
-// io.on('connection', socket=>{
-//     socket.on("SEND", data=>{
-//         console.log(data);
-//         io.emit("RECEIVE",data)
-//     })
-// })
-
+socketServer(app).listen(PORT);

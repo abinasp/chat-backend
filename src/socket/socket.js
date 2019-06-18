@@ -1,26 +1,37 @@
+import socket from 'socket.io';
 import http from 'http';
-import io from 'socket.io';
-import db from '../utils/db';
+import Rooms from '../providers/rooms';
 
-const socketEvents = async(io)=>{
-    const dbc = await db();
-    io.of('/rooms').on('connection', socket=>{
-        socket.on('createRoom',async(name)=>{
-            let isExist = await dbc.collection('rooms').findOne({name : name});
-            if(isExist) {
-                socket.emit('updateRoom', {log: 'Room exists'});
-            }else{
-                
+const Room = new Rooms();
+
+const ioEvents = (io)=>{
+    io.on('connection',socket=>{
+        console.log(socket.id)
+        socket.on("SEND", async(data)=> {
+            if(data.room !==''){
+                if(await Room.OnGetSingleRoom(data.room,data.user,socket.id)){
+                    // let rooms = await Room.OnGetAllRooms();
+                    // rooms.map(room=>{
+                    //     room.connections.map(conn=>{
+                    //         if(conn.socketId === socket.id){
+                    //             io.emit("RECEIVE", data);
+                    //         }
+                    //     })
+                    // })
+                    io.emit("RECEIVE", data);
+                }
             }
-        })
+        });
     })
 }
 
-const socket = (app) =>{
-    let httpServer = http.createServer(app);
-    io(httpServer);
-    socketEvents(io);
-    return httpServer;
+const socketServer = (app)=>{
+    let server = http.Server(app);
+    let io = socket(server);
+
+    ioEvents(io);
+    return server;
 }
 
-export default socket;
+
+export {socketServer};
